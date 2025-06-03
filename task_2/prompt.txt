@@ -1,0 +1,9 @@
+I would like to provide you with a brief note about the bug in the app. You should create a bug ticket from it. The ticket should have a clear description that is understandable to the whole development team. The structure of the ticket should be the following: 
+- Title
+- Description
+- Steps to Reproduce
+- Expected vs Actual Behavior
+- Environment (if known)
+- Severity or Impact
+
+Bug: Logout button doesn’t work on Safari. It just doesn’t respond.
