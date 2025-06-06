@@ -1,0 +1,30 @@
+I will provide you some code for code review under different roles (an Experienced Developer,  a Security Engineer,  a Performance Specialist). You need to do the following:
+- Identify what you should focus on when reviewing code under each role.
+- Review the code and provide specific, actionable recommendations and observations to improve the code under each role separately.
+
+Roles:
+- an Experienced Developer
+- a Security Engineer
+- a Performance Specialist
+
+Code for review:
+def process_user_data(data):
+    users = []
+    
+    for i in range(len(data)):
+        user = {
+            "id": data[i]["id"],
+            "name": data[i]["name"],
+            "email": data[i]["email"],
+            "active": True if data[i]["status"] == "active" else False
+        }
+        users.append(user)
+    
+    print("Processed " + str(len(users)) + " users")
+    
+    return users
+
+def save_to_database(users):
+    # TODO: Implement database connection
+    success = True
+    return success
