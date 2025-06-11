@@ -1,0 +1,72 @@
+Enigma Machine Test Coverage Report
+================================
+
+Test Results
+-----------
+All 22 tests passing:
+- plugboardSwap
+  - should swap letters according to plugboard pairs
+  - should return the same letter if no pairs match
+  - should handle empty pairs
+- Rotor
+  - should initialize correctly
+  - should step correctly
+  - should handle position wrapping
+  - should detect when at notch position
+  - should map characters forward correctly
+  - should map characters backward correctly
+  - should account for rotor position in forward mapping
+  - should account for ring setting in mapping
+- Enigma
+  - should initialize correctly
+  - should step rotors correctly
+  - should handle double-stepping mechanism
+  - should encrypt a single character correctly
+  - should pass through non-alphabet characters unchanged
+  - should process an entire message correctly
+  - should apply plugboard swaps correctly
+  - should handle mixed case input
+  - should handle different rotor positions
+  - should handle different ring settings
+  - should encrypt and decrypt with all settings combined
+
+Coverage Summary
+---------------
+| File       | % Statements | % Branches | % Functions | % Lines  | Uncovered Line #s |
+|------------|--------------|------------|-------------|----------|-------------------|
+| All files  | 76.66        | 68.75      | 68.42       | 73.58    |                   |
+| enigma.js  | 76.66        | 68.75      | 68.42       | 73.58    | 92-116,124        |
+
+Bug Identified
+-------------
+The original Enigma machine implementation had a critical flaw in how the plugboard swaps were applied during encryption and decryption. In a real Enigma machine, the plugboard (Steckerbrett) swaps letters both at the input and output of the encryption circuit.
+
+The issue was that the plugboard swap was only applied at the beginning of the encryption path. The signal would pass through the plugboard, then through the rotors and reflector, but would not pass through the plugboard again on the return path.
+
+Fix Applied
+----------
+Added the plugboard swap application after the signal has passed through all rotors and the reflector:
+
+```javascript
+encryptChar(c) {
+  if (!alphabet.includes(c)) return c;
+  this.stepRotors();
+  c = plugboardSwap(c, this.plugboardPairs);
+  for (let i = this.rotors.length - 1; i >= 0; i--) {
+    c = this.rotors[i].forward(c);
+  }
+
+  c = REFLECTOR[alphabet.indexOf(c)];
+
+  for (let i = 0; i < this.rotors.length; i++) {
+    c = this.rotors[i].backward(c);
+  }
+
+  // Added this line to apply plugboard swaps a second time
+  c = plugboardSwap(c, this.plugboardPairs);
+
+  return c;
+}
+```
+
+With this fix, the Enigma machine now correctly encrypts and decrypts messages with all configuration options, including plugboard pairs. 
