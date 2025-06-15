@@ -1,0 +1,29 @@
+
+> sea-battle-cli@1.0.0 test
+> jest --coverage
+
+PASS tests/GameEngine.test.js
+PASS tests/Board.test.js
+PASS tests/ShipPlacer.test.js
+PASS tests/Ship.test.js
+----------------|---------|----------|---------|---------|-------------------------------------------
+File            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                         
+----------------|---------|----------|---------|---------|-------------------------------------------
+All files       |   77.44 |       70 |   88.13 |   77.43 |                                           
+ game           |   79.71 |    78.04 |     100 |   79.71 |                                           
+  GameEngine.js |   79.71 |    78.04 |     100 |   79.71 | 38,52,76,88,93-95,109,122,144,149-151,167 
+ models         |     100 |    96.42 |     100 |     100 |                                           
+  Board.js      |     100 |    95.23 |     100 |     100 | 61                                        
+  Ship.js       |     100 |      100 |     100 |     100 |                                           
+ players        |   55.33 |    21.62 |   68.18 |   55.55 |                                           
+  CPUPlayer.js  |   41.37 |    20.83 |      50 |   42.85 | 24-34,61-74,87-100,113-138,154-163        
+  Player.js     |   73.33 |    23.07 |   83.33 |   72.09 | 47-52,67-74,92,135                        
+ utils          |     100 |      100 |     100 |     100 |                                           
+  ShipPlacer.js |     100 |      100 |     100 |     100 |                                           
+----------------|---------|----------|---------|---------|-------------------------------------------
+
+Test Suites: 4 passed, 4 total
+Tests:       60 passed, 60 total
+Snapshots:   0 total
+Time:        0.807 s, estimated 1 s
+Ran all test suites.
