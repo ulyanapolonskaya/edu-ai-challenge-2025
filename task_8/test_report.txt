@@ -1,134 +1,86 @@
-VALIDATION LIBRARY TEST COVERAGE REPORT
-=========================================
-Generated: $(date)
 
-OVERVIEW
-========
-Total Tests: 33
-Passed: 33
-Failed: 0
-Success Rate: 100%
+> task_8@1.0.0 test:coverage
+> jest --coverage
 
-COMPONENT COVERAGE
-==================
+  console.log
+    Validation Result:
 
-1. STRING VALIDATOR (7 tests)
-   ✅ Valid string acceptance
-   ✅ Non-string rejection
-   ✅ Minimum length enforcement
-   ✅ Maximum length enforcement
-   ✅ Pattern matching enforcement
-   ✅ Optional value handling
-   ✅ Custom error message support
+      at Object.log (schema.js:566:9)
 
-2. NUMBER VALIDATOR (5 tests)
-   ✅ Valid number acceptance
-   ✅ Non-number rejection
-   ✅ Minimum value enforcement
-   ✅ Maximum value enforcement
-   ✅ Integer constraint enforcement
+  console.log
+    Is Valid: true
 
-3. BOOLEAN VALIDATOR (2 tests)
-   ✅ Valid boolean acceptance (true/false)
-   ✅ Non-boolean rejection
+      at Object.log (schema.js:567:9)
 
-4. DATE VALIDATOR (4 tests)
-   ✅ Valid Date object acceptance
-   ✅ Valid date string acceptance and conversion
-   ✅ Invalid date rejection
-   ✅ Minimum date enforcement
+  console.log
+    Validated Data: {
+      "id": "12345",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "age": null,
+      "isActive": true,
+      "tags": [
+        "developer",
+        "designer"
+      ],
+      "address": {
+        "street": "123 Main St",
+        "city": "Anytown",
+        "postalCode": "12345",
+        "country": "USA"
+      },
+      "metadata": null
+    }
 
-5. ARRAY VALIDATOR (5 tests)
-   ✅ Valid array acceptance
-   ✅ Non-array rejection
-   ✅ Array item validation
-   ✅ Minimum length enforcement
-   ✅ Maximum length enforcement
+      at Object.log (schema.js:571:11)
 
-6. OBJECT VALIDATOR (4 tests)
-   ✅ Valid object acceptance
-   ✅ Non-object rejection
-   ✅ Object property validation
-   ✅ Optional property handling
+PASS ./schema.test.js
+  ValidationResult
+    ✓ should create successful validation result (3 ms)
+    ✓ should create failed validation result (1 ms)
+  StringValidator
+    ✓ should validate valid strings (1 ms)
+    ✓ should reject non-string values (1 ms)
+    ✓ should validate minimum length (3 ms)
+    ✓ should validate pattern (2 ms)
+    ✓ should handle optional strings (1 ms)
+  NumberValidator
+    ✓ should validate valid numbers (1 ms)
+    ✓ should reject non-number values (2 ms)
+    ✓ should validate minimum value (3 ms)
+    ✓ should validate integers only (4 ms)
+  BooleanValidator
+    ✓ should validate boolean values (3 ms)
+    ✓ should reject non-boolean values
+  ArrayValidator
+    ✓ should validate arrays with valid items (3 ms)
+    ✓ should reject non-arrays
+    ✓ should validate array items (2 ms)
+  ObjectValidator
+    ✓ should validate valid objects (2 ms)
+    ✓ should reject non-objects
+    ✓ should validate object properties (1 ms)
+  Complex Schema Integration
+    ✓ should validate user schema from example (2 ms)
+  DateValidator
+    ✓ should validate valid dates (1 ms)
+    ✓ should reject invalid dates (1 ms)
+    ✓ should validate date ranges (1 ms)
+  Edge Cases and Error Handling
+    ✓ should handle circular references gracefully (1 ms)
+    ✓ should handle very large arrays (2 ms)
+    ✓ should handle deeply nested objects (1 ms)
+  Performance Tests
+    ✓ should validate large datasets efficiently (13 ms)
 
-7. COMPLEX SCHEMA VALIDATION (2 tests)
-   ✅ Nested schema validation success
-   ✅ Nested schema validation failure with proper error reporting
-
-8. EDGE CASES (3 tests)
-   ✅ Null and undefined value handling
-   ✅ Error path information in nested objects
-   ✅ Error path information in arrays
-
-9. PERFORMANCE TESTING (1 test)
-   ✅ Large dataset validation performance (1000 items < 1000ms)
-
-VALIDATION FEATURES TESTED
-===========================
-• Type checking for all primitive types (string, number, boolean, date)
-• Complex type validation (arrays, objects)
-• Chainable validation methods
-• Optional value support
-• Custom error messages
-• Minimum/maximum constraints
-• Pattern matching (regex)
-• Nested schema validation
-• Error path tracking
-• Performance with large datasets
-• Edge case handling (null, undefined)
-
-ERROR HANDLING COVERAGE
-========================
-• Invalid type errors
-• Constraint violation errors
-• Pattern mismatch errors
-• Required field missing errors
-• Custom error message propagation
-• Error path tracking for nested structures
-• Array index error tracking
-
-PERFORMANCE METRICS
-===================
-• Large dataset (1000 objects): < 1000ms
-• Memory efficient validation
-• No memory leaks detected in test runs
-
-ROBUSTNESS INDICATORS
-=====================
-• 100% test pass rate
-• Comprehensive error handling
-• Type-safe validation
-• JavaScript best practices followed
-• Proper inheritance hierarchy
-• Chainable API design
-• Module export compatibility (Node.js/Browser)
-
-RECOMMENDED USAGE PATTERNS
-===========================
-1. Simple validation: Schema.string().validate(value)
-2. Complex validation: Schema.string().minLength(2).maxLength(50).validate(value)
-3. Optional fields: Schema.number().optional().validate(value)
-4. Custom errors: Schema.string().withMessage('Custom error').validate(value)
-5. Nested objects: Schema.object({ field: Schema.string() }).validate(value)
-6. Arrays: Schema.array(Schema.string()).validate(value)
-
-TEST ENVIRONMENT
-================
-• Runtime: Node.js
-• Testing Framework: Custom test runner
-• Assertion Library: Custom assertions
-• Coverage Method: Manual test case analysis
-
-QUALITY METRICS
-===============
-• Code Coverage: 100% of public API methods tested
-• Edge Case Coverage: Comprehensive null/undefined/invalid type handling
-• Error Scenario Coverage: All validation failure paths tested
-• Performance Coverage: Large dataset validation tested
-• Integration Coverage: Complex nested schema validation tested
-
-CONCLUSION
-==========
-The validation library demonstrates robust functionality with comprehensive test coverage.
-All core features are working as expected with proper error handling and performance characteristics.
-The library is ready for production use with confidence in its reliability and correctness. 
+-----------|---------|----------|---------|---------|--------------------------------------------
+File       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                          
+-----------|---------|----------|---------|---------|--------------------------------------------
+All files  |   89.92 |    85.71 |   88.88 |   89.84 |                                            
+ schema.js |   89.92 |    85.71 |   88.88 |   89.84 | 84,101,173,217-218,259,370-381,403,408,569 
+-----------|---------|----------|---------|---------|--------------------------------------------
+Test Suites: 1 passed, 1 total
+Tests:       27 passed, 27 total
+Snapshots:   0 total
+Time:        0.453 s, estimated 2 s
+Ran all test suites.

@@ -1,0 +1,17 @@
+{
+  "name": "task_8",
+  "version": "1.0.0",
+  "description": "",
+  "main": "schema.js",
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.0.0"
+  }
+}

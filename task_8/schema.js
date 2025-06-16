@@ -1,10 +1,49 @@
 /**
  * Robust Validation Library for JavaScript
- * Provides type-safe validation for primitive and complex data structures
+ * Provides type-safe validation for primitive and complex data types
+ *
+ * @author Your Name
+ * @version 1.0.0
  */
 
 /**
- * Base validator class that all validators extend
+ * Validation result interface
+ */
+class ValidationResult {
+  constructor(success, errors = [], value = null) {
+    this.success = success;
+    this.errors = errors;
+    this.value = value;
+  }
+
+  /**
+   * Checks if validation was successful
+   * @returns {boolean} True if validation passed
+   */
+  isValid() {
+    return this.success;
+  }
+
+  /**
+   * Gets all validation errors
+   * @returns {string[]} Array of error messages
+   */
+  getErrors() {
+    return this.errors;
+  }
+
+  /**
+   * Gets the validated value
+   * @returns {any} The validated value
+   */
+  getValue() {
+    return this.value;
+  }
+}
+
+/**
+ * Base validator class
+ * All specific validators extend from this class
  */
 class Validator {
   constructor() {
@@ -13,7 +52,7 @@ class Validator {
   }
 
   /**
-   * Mark this validator as optional
+   * Makes the field optional
    * @returns {Validator} The validator instance for chaining
    */
   optional() {
@@ -22,7 +61,7 @@ class Validator {
   }
 
   /**
-   * Set a custom error message for this validator
+   * Sets a custom error message
    * @param {string} message - Custom error message
    * @returns {Validator} The validator instance for chaining
    */
@@ -32,46 +71,40 @@ class Validator {
   }
 
   /**
-   * Validate a value against this validator
+   * Validates the input value
    * @param {any} value - Value to validate
    * @returns {ValidationResult} Validation result
    */
   validate(value) {
-    throw new Error('validate method must be implemented by subclasses');
+    // Handle optional values
+    if (value === undefined || value === null) {
+      if (this.isOptional) {
+        return new ValidationResult(true, [], value);
+      } else {
+        return new ValidationResult(
+          false,
+          [this.customMessage || 'Value is required'],
+          value
+        );
+      }
+    }
+
+    return this._validate(value);
   }
 
   /**
-   * Create a validation error result
-   * @param {string} message - Error message
-   * @param {string} path - Path to the invalid field
-   * @returns {ValidationResult} Error result
+   * Internal validation method to be implemented by subclasses
+   * @param {any} value - Value to validate
+   * @returns {ValidationResult} Validation result
    */
-  createError(message, path = '') {
-    return {
-      success: false,
-      error: {
-        message: this.customMessage || message,
-        path: path,
-        value: undefined,
-      },
-    };
-  }
-
-  /**
-   * Create a successful validation result
-   * @param {any} value - Validated value
-   * @returns {ValidationResult} Success result
-   */
-  createSuccess(value) {
-    return {
-      success: true,
-      data: value,
-    };
+  _validate(value) {
+    throw new Error('_validate method must be implemented by subclasses');
   }
 }
 
 /**
- * String validator with chainable validation methods
+ * String validator class
+ * Validates string values with various constraints
  */
 class StringValidator extends Validator {
   constructor() {
@@ -82,7 +115,7 @@ class StringValidator extends Validator {
   }
 
   /**
-   * Set minimum length requirement
+   * Sets minimum length constraint
    * @param {number} length - Minimum length
    * @returns {StringValidator} The validator instance for chaining
    */
@@ -92,7 +125,7 @@ class StringValidator extends Validator {
   }
 
   /**
-   * Set maximum length requirement
+   * Sets maximum length constraint
    * @param {number} length - Maximum length
    * @returns {StringValidator} The validator instance for chaining
    */
@@ -102,7 +135,7 @@ class StringValidator extends Validator {
   }
 
   /**
-   * Set pattern requirement
+   * Sets pattern constraint
    * @param {RegExp} pattern - Regular expression pattern
    * @returns {StringValidator} The validator instance for chaining
    */
@@ -111,47 +144,51 @@ class StringValidator extends Validator {
     return this;
   }
 
-  validate(value, path = '') {
-    // Handle optional values
-    if (value === undefined || value === null) {
-      if (this.isOptional) {
-        return this.createSuccess(value);
-      }
-      return this.createError('String is required', path);
-    }
+  /**
+   * Internal validation for string values
+   * @param {any} value - Value to validate
+   * @returns {ValidationResult} Validation result
+   */
+  _validate(value) {
+    const errors = [];
 
     // Check if value is a string
     if (typeof value !== 'string') {
-      return this.createError('Expected string, got ' + typeof value, path);
+      return new ValidationResult(
+        false,
+        [this.customMessage || 'Value must be a string'],
+        value
+      );
     }
 
     // Check minimum length
     if (this.minLengthValue !== null && value.length < this.minLengthValue) {
-      return this.createError(
-        `String must be at least ${this.minLengthValue} characters long`,
-        path
+      errors.push(
+        `String must be at least ${this.minLengthValue} characters long`
       );
     }
 
     // Check maximum length
     if (this.maxLengthValue !== null && value.length > this.maxLengthValue) {
-      return this.createError(
-        `String must be at most ${this.maxLengthValue} characters long`,
-        path
+      errors.push(
+        `String must be at most ${this.maxLengthValue} characters long`
       );
     }
 
     // Check pattern
-    if (this.patternValue !== null && !this.patternValue.test(value)) {
-      return this.createError('String does not match required pattern', path);
+    if (this.patternValue && !this.patternValue.test(value)) {
+      errors.push(
+        this.customMessage || 'String does not match the required pattern'
+      );
     }
 
-    return this.createSuccess(value);
+    return new ValidationResult(errors.length === 0, errors, value);
   }
 }
 
 /**
- * Number validator with chainable validation methods
+ * Number validator class
+ * Validates numeric values with various constraints
  */
 class NumberValidator extends Validator {
   constructor() {
@@ -162,27 +199,27 @@ class NumberValidator extends Validator {
   }
 
   /**
-   * Set minimum value requirement
-   * @param {number} value - Minimum value
+   * Sets minimum value constraint
+   * @param {number} min - Minimum value
    * @returns {NumberValidator} The validator instance for chaining
    */
-  min(value) {
-    this.minValue = value;
+  min(min) {
+    this.minValue = min;
     return this;
   }
 
   /**
-   * Set maximum value requirement
-   * @param {number} value - Maximum value
+   * Sets maximum value constraint
+   * @param {number} max - Maximum value
    * @returns {NumberValidator} The validator instance for chaining
    */
-  max(value) {
-    this.maxValue = value;
+  max(max) {
+    this.maxValue = max;
     return this;
   }
 
   /**
-   * Require integer values only
+   * Restricts validation to integers only
    * @returns {NumberValidator} The validator instance for chaining
    */
   integer() {
@@ -190,63 +227,68 @@ class NumberValidator extends Validator {
     return this;
   }
 
-  validate(value, path = '') {
-    // Handle optional values
-    if (value === undefined || value === null) {
-      if (this.isOptional) {
-        return this.createSuccess(value);
-      }
-      return this.createError('Number is required', path);
-    }
+  /**
+   * Internal validation for numeric values
+   * @param {any} value - Value to validate
+   * @returns {ValidationResult} Validation result
+   */
+  _validate(value) {
+    const errors = [];
 
     // Check if value is a number
     if (typeof value !== 'number' || isNaN(value)) {
-      return this.createError('Expected number, got ' + typeof value, path);
+      return new ValidationResult(
+        false,
+        [this.customMessage || 'Value must be a number'],
+        value
+      );
     }
 
     // Check if integer is required
     if (this.integerOnly && !Number.isInteger(value)) {
-      return this.createError('Expected integer, got decimal', path);
+      errors.push('Value must be an integer');
     }
 
     // Check minimum value
     if (this.minValue !== null && value < this.minValue) {
-      return this.createError(`Number must be at least ${this.minValue}`, path);
+      errors.push(`Value must be at least ${this.minValue}`);
     }
 
     // Check maximum value
     if (this.maxValue !== null && value > this.maxValue) {
-      return this.createError(`Number must be at most ${this.maxValue}`, path);
+      errors.push(`Value must be at most ${this.maxValue}`);
     }
 
-    return this.createSuccess(value);
+    return new ValidationResult(errors.length === 0, errors, value);
   }
 }
 
 /**
- * Boolean validator
+ * Boolean validator class
+ * Validates boolean values
  */
 class BooleanValidator extends Validator {
-  validate(value, path = '') {
-    // Handle optional values
-    if (value === undefined || value === null) {
-      if (this.isOptional) {
-        return this.createSuccess(value);
-      }
-      return this.createError('Boolean is required', path);
-    }
-
-    // Check if value is a boolean
+  /**
+   * Internal validation for boolean values
+   * @param {any} value - Value to validate
+   * @returns {ValidationResult} Validation result
+   */
+  _validate(value) {
     if (typeof value !== 'boolean') {
-      return this.createError('Expected boolean, got ' + typeof value, path);
+      return new ValidationResult(
+        false,
+        [this.customMessage || 'Value must be a boolean'],
+        value
+      );
     }
 
-    return this.createSuccess(value);
+    return new ValidationResult(true, [], value);
   }
 }
 
 /**
- * Date validator
+ * Date validator class
+ * Validates date values
  */
 class DateValidator extends Validator {
   constructor() {
@@ -256,7 +298,7 @@ class DateValidator extends Validator {
   }
 
   /**
-   * Set minimum date requirement
+   * Sets minimum date constraint
    * @param {Date} date - Minimum date
    * @returns {DateValidator} The validator instance for chaining
    */
@@ -266,7 +308,7 @@ class DateValidator extends Validator {
   }
 
   /**
-   * Set maximum date requirement
+   * Sets maximum date constraint
    * @param {Date} date - Maximum date
    * @returns {DateValidator} The validator instance for chaining
    */
@@ -275,48 +317,41 @@ class DateValidator extends Validator {
     return this;
   }
 
-  validate(value, path = '') {
-    // Handle optional values
-    if (value === undefined || value === null) {
-      if (this.isOptional) {
-        return this.createSuccess(value);
-      }
-      return this.createError('Date is required', path);
-    }
-
-    // Convert to Date if it's a string
-    let dateValue = value;
-    if (typeof value === 'string') {
-      dateValue = new Date(value);
-    }
+  /**
+   * Internal validation for date values
+   * @param {any} value - Value to validate
+   * @returns {ValidationResult} Validation result
+   */
+  _validate(value) {
+    const errors = [];
 
     // Check if value is a valid date
-    if (!(dateValue instanceof Date) || isNaN(dateValue.getTime())) {
-      return this.createError('Expected valid date', path);
+    const date = new Date(value);
+    if (isNaN(date.getTime())) {
+      return new ValidationResult(
+        false,
+        [this.customMessage || 'Value must be a valid date'],
+        value
+      );
     }
 
     // Check minimum date
-    if (this.minDate !== null && dateValue < this.minDate) {
-      return this.createError(
-        `Date must be after ${this.minDate.toISOString()}`,
-        path
-      );
+    if (this.minDate && date < this.minDate) {
+      errors.push(`Date must be after ${this.minDate.toISOString()}`);
     }
 
     // Check maximum date
-    if (this.maxDate !== null && dateValue > this.maxDate) {
-      return this.createError(
-        `Date must be before ${this.maxDate.toISOString()}`,
-        path
-      );
+    if (this.maxDate && date > this.maxDate) {
+      errors.push(`Date must be before ${this.maxDate.toISOString()}`);
     }
 
-    return this.createSuccess(dateValue);
+    return new ValidationResult(errors.length === 0, errors, date);
   }
 }
 
 /**
- * Array validator for validating arrays of specific types
+ * Array validator class
+ * Validates array values and their items
  */
 class ArrayValidator extends Validator {
   constructor(itemValidator) {
@@ -327,7 +362,7 @@ class ArrayValidator extends Validator {
   }
 
   /**
-   * Set minimum array length requirement
+   * Sets minimum length constraint
    * @param {number} length - Minimum length
    * @returns {ArrayValidator} The validator instance for chaining
    */
@@ -337,7 +372,7 @@ class ArrayValidator extends Validator {
   }
 
   /**
-   * Set maximum array length requirement
+   * Sets maximum length constraint
    * @param {number} length - Maximum length
    * @returns {ArrayValidator} The validator instance for chaining
    */
@@ -346,55 +381,51 @@ class ArrayValidator extends Validator {
     return this;
   }
 
-  validate(value, path = '') {
-    // Handle optional values
-    if (value === undefined || value === null) {
-      if (this.isOptional) {
-        return this.createSuccess(value);
-      }
-      return this.createError('Array is required', path);
-    }
+  /**
+   * Internal validation for array values
+   * @param {any} value - Value to validate
+   * @returns {ValidationResult} Validation result
+   */
+  _validate(value) {
+    const errors = [];
 
     // Check if value is an array
     if (!Array.isArray(value)) {
-      return this.createError('Expected array, got ' + typeof value, path);
+      return new ValidationResult(
+        false,
+        [this.customMessage || 'Value must be an array'],
+        value
+      );
     }
 
     // Check minimum length
     if (this.minLengthValue !== null && value.length < this.minLengthValue) {
-      return this.createError(
-        `Array must have at least ${this.minLengthValue} items`,
-        path
-      );
+      errors.push(`Array must have at least ${this.minLengthValue} items`);
     }
 
     // Check maximum length
     if (this.maxLengthValue !== null && value.length > this.maxLengthValue) {
-      return this.createError(
-        `Array must have at most ${this.maxLengthValue} items`,
-        path
-      );
+      errors.push(`Array must have at most ${this.maxLengthValue} items`);
     }
 
     // Validate each item in the array
     const validatedItems = [];
     for (let i = 0; i < value.length; i++) {
-      const itemPath = path ? `${path}[${i}]` : `[${i}]`;
-      const result = this.itemValidator.validate(value[i], itemPath);
-
-      if (!result.success) {
-        return result;
+      const itemResult = this.itemValidator.validate(value[i]);
+      if (!itemResult.isValid()) {
+        errors.push(`Item at index ${i}: ${itemResult.getErrors().join(', ')}`);
+      } else {
+        validatedItems.push(itemResult.getValue());
       }
-
-      validatedItems.push(result.data);
     }
 
-    return this.createSuccess(validatedItems);
+    return new ValidationResult(errors.length === 0, errors, validatedItems);
   }
 }
 
 /**
- * Object validator for validating objects with specific schemas
+ * Object validator class
+ * Validates object values and their properties
  */
 class ObjectValidator extends Validator {
   constructor(schema) {
@@ -402,55 +433,48 @@ class ObjectValidator extends Validator {
     this.schema = schema;
   }
 
-  validate(value, path = '') {
-    // Handle optional values
-    if (value === undefined || value === null) {
-      if (this.isOptional) {
-        return this.createSuccess(value);
-      }
-      return this.createError('Object is required', path);
-    }
+  /**
+   * Internal validation for object values
+   * @param {any} value - Value to validate
+   * @returns {ValidationResult} Validation result
+   */
+  _validate(value) {
+    const errors = [];
 
     // Check if value is an object
-    if (typeof value !== 'object' || Array.isArray(value)) {
-      return this.createError(
-        'Expected object, got ' +
-          (Array.isArray(value) ? 'array' : typeof value),
-        path
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+      return new ValidationResult(
+        false,
+        [this.customMessage || 'Value must be an object'],
+        value
       );
     }
 
     const validatedObject = {};
-    const errors = [];
 
-    // Validate each field in the schema
+    // Validate each property in the schema
     for (const [key, validator] of Object.entries(this.schema)) {
-      const fieldPath = path ? `${path}.${key}` : key;
-      const result = validator.validate(value[key], fieldPath);
-
-      if (!result.success) {
-        errors.push(result.error);
+      const propertyResult = validator.validate(value[key]);
+      if (!propertyResult.isValid()) {
+        errors.push(
+          `Property '${key}': ${propertyResult.getErrors().join(', ')}`
+        );
       } else {
-        validatedObject[key] = result.data;
+        validatedObject[key] = propertyResult.getValue();
       }
     }
 
-    // Return first error if any validation failed
-    if (errors.length > 0) {
-      return {
-        success: false,
-        error: errors[0], // Return the first error for simplicity
-      };
-    }
-
-    return this.createSuccess(validatedObject);
+    return new ValidationResult(errors.length === 0, errors, validatedObject);
   }
 }
 
-// Schema Builder
+/**
+ * Schema Builder - Main entry point for creating validators
+ * Provides static methods to create various types of validators
+ */
 class Schema {
   /**
-   * Create a string validator
+   * Creates a string validator
    * @returns {StringValidator} String validator instance
    */
   static string() {
@@ -458,7 +482,7 @@ class Schema {
   }
 
   /**
-   * Create a number validator
+   * Creates a number validator
    * @returns {NumberValidator} Number validator instance
    */
   static number() {
@@ -466,7 +490,7 @@ class Schema {
   }
 
   /**
-   * Create a boolean validator
+   * Creates a boolean validator
    * @returns {BooleanValidator} Boolean validator instance
    */
   static boolean() {
@@ -474,7 +498,7 @@ class Schema {
   }
 
   /**
-   * Create a date validator
+   * Creates a date validator
    * @returns {DateValidator} Date validator instance
    */
   static date() {
@@ -482,8 +506,8 @@ class Schema {
   }
 
   /**
-   * Create an object validator
-   * @param {Object} schema - Schema definition object
+   * Creates an object validator with the provided schema
+   * @param {Object} schema - Object schema defining property validators
    * @returns {ObjectValidator} Object validator instance
    */
   static object(schema) {
@@ -491,7 +515,7 @@ class Schema {
   }
 
   /**
-   * Create an array validator
+   * Creates an array validator with the provided item validator
    * @param {Validator} itemValidator - Validator for array items
    * @returns {ArrayValidator} Array validator instance
    */
@@ -500,67 +524,54 @@ class Schema {
   }
 }
 
-// Export for Node.js modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    Schema,
-    Validator,
-    StringValidator,
-    NumberValidator,
-    BooleanValidator,
-    DateValidator,
-    ArrayValidator,
-    ObjectValidator,
-  };
+// Define a complex schema
+const addressSchema = Schema.object({
+  street: Schema.string(),
+  city: Schema.string(),
+  postalCode: Schema.string()
+    .pattern(/^\d{5}$/)
+    .withMessage('Postal code must be 5 digits'),
+  country: Schema.string(),
+});
+
+const userSchema = Schema.object({
+  id: Schema.string().withMessage('ID must be a string'),
+  name: Schema.string().minLength(2).maxLength(50),
+  email: Schema.string().pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
+  age: Schema.number().optional(),
+  isActive: Schema.boolean(),
+  tags: Schema.array(Schema.string()),
+  address: addressSchema.optional(),
+  metadata: Schema.object({}).optional(),
+});
+
+// Validate data
+const userData = {
+  id: '12345',
+  name: 'John Doe',
+  email: 'john@example.com',
+  isActive: true,
+  tags: ['developer', 'designer'],
+  address: {
+    street: '123 Main St',
+    city: 'Anytown',
+    postalCode: '12345',
+    country: 'USA',
+  },
+};
+
+const result = userSchema.validate(userData);
+
+// Display validation results
+console.log('Validation Result:');
+console.log('Is Valid:', result.isValid());
+if (!result.isValid()) {
+  console.log('Errors:', result.getErrors());
+} else {
+  console.log('Validated Data:', JSON.stringify(result.getValue(), null, 2));
 }
 
-// Example usage and testing
-if (typeof require === 'undefined' || require.main === module) {
-  // Define a complex schema
-  const addressSchema = Schema.object({
-    street: Schema.string(),
-    city: Schema.string(),
-    postalCode: Schema.string()
-      .pattern(/^\d{5}$/)
-      .withMessage('Postal code must be 5 digits'),
-    country: Schema.string(),
-  });
-
-  const userSchema = Schema.object({
-    id: Schema.string().withMessage('ID must be a string'),
-    name: Schema.string().minLength(2).maxLength(50),
-    email: Schema.string().pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
-    age: Schema.number().optional(),
-    isActive: Schema.boolean(),
-    tags: Schema.array(Schema.string()),
-    address: addressSchema.optional(),
-    metadata: Schema.object({}).optional(),
-  });
-
-  // Test data
-  const userData = {
-    id: '12345',
-    name: 'John Doe',
-    email: 'john@example.com',
-    isActive: true,
-    tags: ['developer', 'designer'],
-    address: {
-      street: '123 Main St',
-      city: 'Anytown',
-      postalCode: '12345',
-      country: 'USA',
-    },
-  };
-
-  // Validate data
-  const result = userSchema.validate(userData);
-
-  if (result.success) {
-    console.log('✅ Validation successful!');
-    console.log('Validated data:', JSON.stringify(result.data, null, 2));
-  } else {
-    console.log('❌ Validation failed!');
-    console.log('Error:', result.error.message);
-    console.log('Path:', result.error.path);
-  }
+// Export for use in other files
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { Schema, ValidationResult, Validator };
 }
