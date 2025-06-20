@@ -1,0 +1,20 @@
+{
+  "note": "This is a placeholder analysis file. To generate actual analytics, run: python main.py CAR0004.mp3",
+  "word_count": 0,
+  "speaking_speed_wpm": 0,
+  "frequently_mentioned_topics": [
+    {
+      "topic": "Example Topic 1",
+      "mentions": 0
+    },
+    {
+      "topic": "Example Topic 2", 
+      "mentions": 0
+    }
+  ],
+  "instructions": {
+    "setup": "Set OPENAI_API_KEY environment variable",
+    "run": "python main.py CAR0004.mp3",
+    "description": "Actual analytics will be generated from the CAR0004.mp3 file when processed with OpenAI APIs"
+  }
+} 
