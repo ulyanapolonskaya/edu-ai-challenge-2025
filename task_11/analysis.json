@@ -1,20 +1,42 @@
 {
-  "note": "This is a placeholder analysis file. To generate actual analytics, run: python main.py CAR0004.mp3",
-  "word_count": 0,
-  "speaking_speed_wpm": 0,
+  "word_count": 968,
+  "speaking_speed_wpm": 150,
   "frequently_mentioned_topics": [
     {
-      "topic": "Example Topic 1",
-      "mentions": 0
+      "topic": "chest pain",
+      "mentions": 15
     },
     {
-      "topic": "Example Topic 2", 
-      "mentions": 0
+      "topic": "heart attack",
+      "mentions": 7
+    },
+    {
+      "topic": "symptoms",
+      "mentions": 10
+    },
+    {
+      "topic": "medical history",
+      "mentions": 6
+    },
+    {
+      "topic": "family history",
+      "mentions": 4
+    },
+    {
+      "topic": "medications",
+      "mentions": 5
+    },
+    {
+      "topic": "tests (ECG, blood work)",
+      "mentions": 4
+    },
+    {
+      "topic": "pain characteristics (sharp, location, duration)",
+      "mentions": 8
+    },
+    {
+      "topic": "lifestyle (smoking, alcohol, drug use)",
+      "mentions": 4
     }
-  ],
-  "instructions": {
-    "setup": "Set OPENAI_API_KEY environment variable",
-    "run": "python main.py CAR0004.mp3",
-    "description": "Actual analytics will be generated from the CAR0004.mp3 file when processed with OpenAI APIs"
-  }
-} 
+  ]
+}
